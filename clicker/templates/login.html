@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+    {% if invalid %}
+        <p>Введи нормальные данные</p>
+    {% endif %}
+    <form action="{% url 'login'%}" method="POST">
+      {% csrf_token %}
+      {{user_form.username}}
+      {{user_form.password}}
+      <button type="submit">Войти</button>
+      <a href="{% url 'register' %}">Не зарегистрирован?</a>
+    </form>
+{% endblock %}
