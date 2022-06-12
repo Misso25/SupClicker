@@ -4,19 +4,35 @@ from django.shortcuts import render, redirect
 from backend.forms import UserForm
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CoreSerializer
-from .models import Core
+from rest_framework import viewsets
+from .serializers import CoreSerializer, BoostSerializer
+from .models import Core, Boost
 
 @login_required
 def index(request):
     core = Core.objects.get(user=request.user)
-    return render(request, 'index.html', {'core': core})
+    boosts = Boost.objects.filter(core=core)
+    return render(request, 'index.html', {'core': core, 'boosts': boosts})
 
 @api_view(['GET'])
 def call_click(request):
     core = Core.objects.get(user=request.user)
-    core.click()
-    return Response(CoreSerializer(core).data)
+    is_levelup = core.click()
+    if is_levelup:
+        Boost.objects.create(core=core, price=core.coins, power=core.level*20)
+    return Response({
+        'core': CoreSerializer(core).data,
+        'is_levelup': is_levelup
+    })
+
+class BoostViewSet(viewsets.ModelViewSet):
+    queryset = Boost.objects.all()
+    serializer_class = BoostSerializer
+
+    def get_queryset(self):
+        core = Core.objects.get(user=self.request.user)
+        boosts = Boost.objects.filter(core=core)
+        return boosts
 
 def register(request):
     if request.method == 'POST':
