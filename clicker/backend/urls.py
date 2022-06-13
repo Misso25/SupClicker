@@ -7,7 +7,7 @@ boosts_list = views.BoostViewSet.as_view({
 })
 
 boosts_details = views.BoostViewSet.as_view({
-    'put': 'update', # обновить все поля заметки
+    'put': 'partial_update', # обновить все поля заметки
 })
 
 urlpatterns = [
@@ -17,5 +17,5 @@ urlpatterns = [
     path('call_click/', views.call_click, name='call_click'),
     path('logout/', views.user_logout, name='logout'),
     path('boosts/', boosts_list, name='boosts'),
-    path('boosts/<int:pk', boosts_list, name='boosts'),
+    path('boosts/<int:pk>', boosts_details, name='boosts'),
 ]
